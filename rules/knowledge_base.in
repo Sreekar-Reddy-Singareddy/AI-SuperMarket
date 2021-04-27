@@ -88,22 +88,26 @@ all m (money(m) -> number(m)).
 % --------------------------------------------------------------------------------------------------------------------------------------------
 all p ((exists y exists q (owns(p,y,q) & greater(q,2))) -> adult(p)).
 all p (adult(p) -> -child(p)).
-all x all y  (-drives(x,y) & car(y) -> child(x)).
-all x exists y (adult(x) -> car(y) & drives(x,y)).
-all x all y all s (-drives(x,y) & supermarket(s) -> transport(x,s) = WALK).
-all x all s ((exists y drives(x,y)) & supermarket(s) -> transport(x,s) = CAR).
+all x ((all y (car(y) -> -drives(x,y))) -> child(x)).
+all x (adult(x) -> exists y (car(y) & drives(x,y))).
+all x all s (child(x) & supermarket(s) -> transport(x,s) = WALK).
+all x all s ((exists y (car(y) & drives(x,y))) & supermarket(s) -> transport(x,s) = CAR).
 all p all s (transport(p,s) = CAR -> exists g (gas_station(g) & location(g) = location(s) & visits(p,g))).
-all p all y (-meat(y) & eats(p,y) -> vegan(p)).
+all x all s (transport(x,s) = CAR -> -transport(x,s) = WALK).
+all x all s (transport(x,s) = WALK -> -transport(x,s) = CAR).
+
+all x (person(x) & (all y (meat(y) -> -eats(x,y))) -> vegan(x)). % !!!!
 all p ((exists y (meat(y) & eats(p,y))) -> non_vegan(p)).
 all p (non_vegan(p) -> -vegan(p)).
-all p all y ((eats(p,y) & -sweet(y)) | (drinks(p,y) & -alcohol(y)) -> healthy(p)).
+all p (vegan(p) | non_vegan(p)).
+
+all p all y ((eats(p,y) & -sweet(y)) | (drinks(p,y) & -alcohol(y)) -> healthy(p)). % !!!!
 all p ((exists y drink(y) & drinks(p,y)) -> adult(p)).
 all s all p1 all p2 (supermarket(s) & person(p1) & person(p2) & (exists y1 exists q1 (buys(p1,y1,q1,s) & item(y1))) & (exists y2 exists q2 (buys(p2,y2,q2,s) & item(y2))) -> location(p1) = location(p2)).
-all s all p1 all p2 exists y1 exists y2 exists q1 exists q2 (buys(p1,y1,q1,s) & buys(p2,y2,q2,s) & item(y1) & item(y2) & supermarket(s) & person(p1) & person(p2) -> location(p1) = location(p2)).
 all x all y (seen(x,y) -> seen(y,x)).
-all p ((exists y (chocolate(y) | cookie(y)) & eats(p,y)) -> -has_diabetes(p)).
-all p all y ((chocolate(y) | cookie(y)) & eats(p,y) -> unhealthy(p)).
-all p all y (meat(y) & eats(p,y) -> has_cholestrol(p)).
+all p ((exists y ((chocolate(y) | cookie(y)) & eats(p,y))) -> -has_diabetes(p)).
+all p all y ((chocolate(y) | cookie(y)) & eats(p,y) -> unhealthy(p)). % !!!!
+all p all y (meat(y) & eats(p,y) -> has_cholestrol(p)). % !!!!
 all p (unhealthy(p) -> has_cholestrol(p) | has_diabetes(p)).
 all p ((exists y sanitory_pad(y) & uses(p,y)) -> female(p)).
 all p (female(y) -> -male(y)).
@@ -126,16 +130,16 @@ all x (chocolate(x) | cookie(x) | beer(x) | wine(x) | diaper(x) | sanitory_pad(x
 
 all p all y all q (owns(p,y,q) & type(y) = TOMATO & equal(q,1) -> units(p,y) = 4).
 all p all y all q (owns(p,y,q) & type(y) = TOMATO & equal(q,2) -> units(p,y) = 8).
-all p all y all q (owns(p,y,q) & type(y) = BEEF & equal(q,1) -> units(p,y) = 1).
-all p all y all q (owns(p,y,q) & type(y) = LAMB & equal(q,1) -> units(p,y) = 1).
+all p all y all q (owns(p,y,q) & type(y) = BEEF & equal(q,1) -> ounces(p,y) = 16).
+all p all y all q (owns(p,y,q) & type(y) = LAMB & equal(q,1) -> ounces(p,y) = 1).
 all p all y all q (owns(p,y,q) & type(y) = APPLE & equal(q,1) -> units(p,y) = 2).
-all p all y all q (owns(p,y,q) & type(y) = CHOCOLATE & equal(q,1) -> units(p,y) = 10).
+all p all y all q (owns(p,y,q) & type(y) = CHOCOLATE & equal(q,1) -> blocks(p,y) = 10).
 all p all y all q (owns(p,y,q) & type(y) = COOKIE & equal(q,1) -> units(p,y) = 10).
-all p all y all q (owns(p,y,q) & type(y) = BEER & equal(q,1) -> units(p,y) = 6).
-all p all y all q (owns(p,y,q) & type(y) = WINE & equal(q,1) -> units(p,y) = 2).
+all p all y all q (owns(p,y,q) & type(y) = BEER & equal(q,1) -> bottles(p,y) = 6).
+all p all y all q (owns(p,y,q) & type(y) = WINE & equal(q,1) -> bottles(p,y) = 2).
 all p all y all q (owns(p,y,q) & type(y) = DIAPER & equal(q,1) -> units(p,y) = 8).
 all p all y all q (owns(p,y,q) & type(y) = SANITORY_PAD & equal(q,1) -> units(p,y) = 5).
-all p all y all q (owns(p,y,q) & type(y) = DEODRANT & equal(q,1) -> units(p,y) = 2).
+all p all y all q (owns(p,y,q) & type(y) = DEODRANT & equal(q,1) -> bottles(p,y) = 2).
 
 % --------------------------------------------------------------------------------------------------------------------------------------------
 % ---------- GIVEN KNOWLEDGE
@@ -143,19 +147,18 @@ all p all y all q (owns(p,y,q) & type(y) = DEODRANT & equal(q,1) -> units(p,y) =
 person(John).
 person(Mary).
 supermarket(Safeway).
+
 tomato(T1).
 tomato(T2).
 beef(B1).
+deodrant(D1).
+
 stores(Safeway, T1).
 stores(Safeway, T2).
 stores(Safeway, B1).
-buys(John, T1, 1, Safeway).
-buys(Mary, T2, 2, Safeway).
-time(John) = 100.
-time(Mary) = 100.
-money(10).
-has_money(John, 10).
+stores(Safeway, D1).
 
+buys(John, B1, 1, Safeway).
 
 end_of_list.
 
@@ -171,6 +174,7 @@ number(7).
 number(8).
 number(9).
 number(10).
+number(16).
 greater(1,0).
 greater(2,1).
 greater(3,2).
@@ -181,6 +185,7 @@ greater(7,6).
 greater(8,7).
 greater(9,8).
 greater(10,9).
+greater(16,1).
 equal(0,0).
 equal(1,1).
 equal(2,2).
@@ -192,13 +197,14 @@ equal(7,7).
 equal(8,8).
 equal(9,9).
 equal(10,10).
+equal(16,16).
 end_of_list.
 
 formulas(goals).
+greater(ounces(John, B1), 1).
 
-
-
-
+%-has_diabetes(John).
+%exists y (cookie(y) & eats(John, y)).
 %exists m1 (has_money(John, m1) & is_more_money(10,m1)).
 %exists m (money(m) & has_money(John, m) & m=10).
 %exists m1 ((exists m (money(m) & pays(John,m,Safeway))) & money(m1) & has_money(John,m1) & m1=9).
@@ -213,7 +219,11 @@ formulas(goals).
 %exists m (has_cash(John, m) | has_credit(John,m)). % [YES] John has either one of them since he bought something.
 %exists m (has_money(John,m) & money(m) & is_more_money(10,m)). % NEED TO WORK.
 %exists x (x != John & person(x) & is_inside(x, Safeway)). [YES] Other than John, there are Mary and the staff.
-%vegan(John).
+%non_vegan(John). [NON-VEGAN] Since John eats meat.
+%exists p exists q (supermarket(p) & owns(p,D1,q) & p=Safeway). [Safeway] Supermarket owns the deodrant.
+%greater(ounces(John, B1), 1). [YES] John owns 16 ounces of beef which is more than 1.
+
+
 %exists y (meat(y) & eats(John,y)).
 %owns(John,T1,1).
 

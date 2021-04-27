@@ -1,0 +1,30 @@
+%set (arithmetic).
+
+formulas(sos).
+all x (person(x) & (all y (eats(x,y) -> vegetable(y))) -> vegan(x)).
+all x (person(x) & (exists y (meat(y) & eats(x,y))) -> non_vegan(x)).
+end_of_list.
+
+formulas(assumptions).
+	person(John).
+    vegetable(A1).
+    vegetable(A2).
+    vegetable(A3).
+    meat(A4).
+    eats(John, A1).
+    eats(John, A2).
+    eats(John, A3).
+    %eats(John, A4).
+
+
+
+
+    all x (eats(John, x) -> x=A1 | x=A2 | x=A3).
+    %all x (eats(John, x) -> all y (eats(John, y) -> x=y)).
+    %all y (-eats(John, y) | x=y).
+    %all y (meat(y) -> -eats(John, y)).
+end_of_list.
+
+formulas(goals).
+	vegan(John).
+end_of_list.
