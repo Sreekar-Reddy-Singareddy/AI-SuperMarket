@@ -7,7 +7,7 @@ all x all y all s (item(x) & item(y) & supermarket(s) & stores(s,x) & stores(s,y
 all x all s (item(x) & supermarket(s) & in(location(x),location(s)) -> exists q (owns(s,x,q) & greater(q,0))).
 all x all s all q (supermarket(s) & owns(s,x,q) & greater(q,0) -> sells(s,x)).
 all x all s (sells(s,x) -> -makes(s,x)).
-all s (supermarket(s) -> exists p (parking_lot(p) & location(p) = location(s))).
+all s (supermarket(s) -> exists p (parking_lot(s) = p)).
 all x all s (sells(s,x) -> partof(x,s)).
 all x all s (customer_of(x,s) | staff_of(x,s) -> partof(x,s)).
 all s all c ((exists y exists q (supermarket(s) & person(c) & item(y) & greater(q,0) & buys(c,y,q,s))) -> customer_of(c,s) & in(location(c), location(s))).
@@ -86,32 +86,45 @@ all m (money(m) -> number(m)).
 % --------------------------------------------------------------------------------------------------------------------------------------------
 % ---------- 4. CUSTOMER QUALITIES RULES 
 % --------------------------------------------------------------------------------------------------------------------------------------------
+all p (adult(p) | child(p)).
 all p ((exists y exists q (owns(p,y,q) & greater(q,2))) -> adult(p)).
 all p (adult(p) -> -child(p)).
 all x ((all y (car(y) -> -drives(x,y))) -> child(x)).
 all x (adult(x) -> exists y (car(y) & drives(x,y))).
-all x all s (child(x) & supermarket(s) -> transport(x,s) = WALK).
-all x all s ((exists y (car(y) & drives(x,y))) & supermarket(s) -> transport(x,s) = CAR).
-all p all s (transport(p,s) = CAR -> exists g (gas_station(g) & location(g) = location(s) & visits(p,g))).
-all x all s (transport(x,s) = CAR -> -transport(x,s) = WALK).
-all x all s (transport(x,s) = WALK -> -transport(x,s) = CAR).
+all p ((exists y drink(y) & drinks(p,y)) -> adult(p)).
 
-all x (person(x) & (all y (meat(y) -> -eats(x,y))) -> vegan(x)). % !!!!
+all p (vegan(p) | non_vegan(p)).
 all p ((exists y (meat(y) & eats(p,y))) -> non_vegan(p)).
 all p (non_vegan(p) -> -vegan(p)).
-all p (vegan(p) | non_vegan(p)).
 
-all p all y ((eats(p,y) & -sweet(y)) | (drinks(p,y) & -alcohol(y)) -> healthy(p)). % !!!!
-all p ((exists y drink(y) & drinks(p,y)) -> adult(p)).
-all s all p1 all p2 (supermarket(s) & person(p1) & person(p2) & (exists y1 exists q1 (buys(p1,y1,q1,s) & item(y1))) & (exists y2 exists q2 (buys(p2,y2,q2,s) & item(y2))) -> location(p1) = location(p2)).
-all x all y (seen(x,y) -> seen(y,x)).
-all p ((exists y ((chocolate(y) | cookie(y)) & eats(p,y))) -> -has_diabetes(p)).
-all p all y ((chocolate(y) | cookie(y)) & eats(p,y) -> unhealthy(p)). % !!!!
-all p all y (meat(y) & eats(p,y) -> has_cholestrol(p)). % !!!!
-all p (unhealthy(p) -> has_cholestrol(p) | has_diabetes(p)).
+all p (healthy(p) | unhealthy(p)).
+all p ((exists y exists q (meat(y) & owns(p,y,q) & greater(q,5))) -> risk_of_cholestrol(p)).
+all p ((exists y exists q (sweet(y) & owns(p,y,q) & greater(q,7))) -> risk_of_diabetes(p)).
+all p ((exists y exists q (alcohol(y) & owns(p,y,q) & greater(q,3))) -> risk_of_livercancer(p)).
+all p (risk_of_cholestrol(p) | risk_of_diabetes(p) | risk_of_livercancer(p) -> unhealthy(p)).
+
+all p (male(p) | female(p)).
 all p ((exists y sanitory_pad(y) & uses(p,y)) -> female(p)).
 all p (female(y) -> -male(y)).
 all p ((exists y exists q (diaper(y) & owns(p,y,q))) -> parent(p)).
+
+all s all p1 all p2 (supermarket(s) & person(p1) & person(p2) & (exists y1 exists q1 (buys(p1,y1,q1,s) & item(y1))) & (exists y2 exists q2 (buys(p2,y2,q2,s) & item(y2))) -> location(p1) = location(p2)).
+all x all y (seen(x,y) -> seen(y,x)).
+
+all x (car(x) -> exists t (trunk(x) = t)).
+all x all c (item(x) & car(c) -> fits_in(x,trunk(c))).
+all x all s (child(x) & supermarket(s) -> transport(x,s) = WALK).
+all x all s ((exists y (car(y) & drives(x,y))) & supermarket(s) -> transport(x,s) = CAR).
+
+all p all s (transport(p,s) = CAR & customer_of(p,s) -> parked(p,parking_lot(s))).
+all x all s (transport(x,s) = CAR -> -transport(x,s) = WALK).
+all x all s (transport(x,s) = WALK -> -transport(x,s) = CAR).
+all p all s (transport(p,s) = CAR & customer_of(p,s) -> exists c (car(c) & drives(p,c) & low_on_fuel(c) & visits(p, gas_station(s), c))).
+all p all s (exists c (car(c) & drives(p,c) & visits(p, gas_station(s), c)) -> fills_gas(p, gas_station(s))).
+all p all s (fills_gas(p, gas_station(s)) -> contains(gas_station(s), FUEL)).
+
+all x (person(x) & (all y (meat(y) -> -eats(x,y))) -> vegan(x)). % !!!!
+all p all y ((eats(p,y) & -sweet(y)) | (drinks(p,y) & -alcohol(y)) -> healthy(p)). % !!!!
 
 % --------------------------------------------------------------------------------------------------------------------------------------------
 % ---------- 5. ARITHMETIC RULES         
@@ -159,6 +172,12 @@ stores(Safeway, B1).
 stores(Safeway, D1).
 
 buys(John, B1, 1, Safeway).
+buys(Mary, T1, 1, Safeway).
+
+transport(John, Safeway) = CAR.
+gas_station(Safeway) = GS1.
+
+
 
 end_of_list.
 
@@ -201,13 +220,7 @@ equal(16,16).
 end_of_list.
 
 formulas(goals).
-greater(ounces(John, B1), 1).
-
-%-has_diabetes(John).
-%exists y (cookie(y) & eats(John, y)).
-%exists m1 (has_money(John, m1) & is_more_money(10,m1)).
-%exists m (money(m) & has_money(John, m) & m=10).
-%exists m1 ((exists m (money(m) & pays(John,m,Safeway))) & money(m1) & has_money(John,m1) & m1=9).
+%contains(gas_station(Safeway), FUEL).
 
 %adult(John). % [ADULT] John is an adult.
 %greater(units(John,T), 2). % [YES] John now has >2 tomatoes.
@@ -222,6 +235,8 @@ greater(ounces(John, B1), 1).
 %non_vegan(John). [NON-VEGAN] Since John eats meat.
 %exists p exists q (supermarket(p) & owns(p,D1,q) & p=Safeway). [Safeway] Supermarket owns the deodrant.
 %greater(ounces(John, B1), 1). [YES] John owns 16 ounces of beef which is more than 1.
+%contains(gas_station(Safeway), FUEL). % [YES] Because John and Mary have visited it and filled gas.
+fits_in(B1, trunk(C1)). % [YES] Every item fits in car's trunk.
 
 
 %exists y (meat(y) & eats(John,y)).
