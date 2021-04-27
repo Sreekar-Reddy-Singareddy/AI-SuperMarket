@@ -1,0 +1,31 @@
+%set (arithmetic).
+
+formulas(sos).
+all x all y all s (item(x) & item(y) & supermarket(s) & stores(s,x) & stores(s,y) & type(x) = type(y) -> location(x) = location(y) & in(location(x), location(s)) & in(location(y), location(s))).
+all x all s (item(x) & supermarket(s) & in(location(x),location(s)) -> exists q (owns(s,x,q) & greater(q,0))).
+all x all s all q (supermarket(s) & owns(s,x,q) & greater(q,0) -> sells(s,x)).
+all x all s (sells(s,x) -> -makes(s,x)).
+all s (supermarket(s) -> exists p (parking_lot(p) & location(p) = location(s))).
+all x all s (sells(s,x) -> partof(x,s)).
+all x all s (customer_of(x,s) | staff_of(x,s) -> partof(x,s)).
+all s all c ((exists y exists q (supermarket(s) & person(c) & item(y) & greater(q,0) & buys(c,y,q,s))) -> customer_of(c,s) & in(location(c), location(s))).
+all s (supermarket(s) -> exists p (person(p) & staff_of(p,s) & in(location(p), location(s)))).
+all s all p (staff_of(p,s) -> -customer_of(p,s)).
+all x all y (location(x) = location(y) -> same_location(x,y)).
+all x all y (time(x) = time(y) -> same_time(x,y)).
+all x all y (person(x) & person(y) & same_location(x,y) & same_time(x,y) -> seen(x,y)).
+all p all s (person(p) & supermarket(s) & in(location(p), location(s)) -> is_inside(p,s)).
+
+person(P1).
+end_of_list.
+
+formulas(demodulators).
+type(I1) = T1.
+type(I2) = T1.
+location(PL1) = ADDR1.
+location(S1) = ADDR1.
+end_of_list.
+
+formulas(goals).
+person(U1).
+end_of_list.

@@ -1,0 +1,26 @@
+%set (arithmetic).
+
+formulas(sos).
+all x all y (number(x) & number(y) & greater(x,y) <-> less(y,x)).
+all x all y (number(x) & number(y) & equal(x,y) <-> greater(x,y) & greater(y,x) & less(x,y) & less(y,x)).
+all x all y all z (number(x) & number(y) & number(z) & -equal(x,y) & -equal(y,z) & greater(x,y) & greater(y,z) -> greater(x,z)).
+all x all y (number(x) & number(y) & equal(x,y) <-> equal(y,x)).
+end_of_list.
+
+formulas(assumptions).
+	greater(1,0).
+	greater(2,1).
+	greater(3,2).
+	greater(4,3).
+	greater(5,4).
+	equal(1,1).
+	equal(2,2).
+	equal(3,3).
+	equal(4,4).
+	equal(5,5).
+end_of_list.
+
+formulas(goals).
+	less(1,5).
+end_of_list.
+

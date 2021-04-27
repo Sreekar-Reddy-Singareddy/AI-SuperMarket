@@ -1,0 +1,31 @@
+%set (arithmetic).
+
+formulas(sos).
+all p all s all y all q (supermarket(s) & person(p) & item(y) & greater(q,0) & buys(p,y,q,s) -> owns(p,y,q) & bought_from(p,s)).
+all s all p all y all q exists m (owns(p,y,q) & bought_from(p,s) -> pays(p,m,s)).
+all s all p exists m1 exists m exists m2 (has_money(p,m1) & pays(p,m,s) -> has_money(p,m2) & greater(m1,m2)).
+all p all s all m (pays(p,m,s) -> has_credit(p,m) | has_cash(p,m)).
+all p all y all q (food(y) & owns(p,y,q) -> eats(p,y)).
+all p all y all q (non_food(y) & owns(p,y,q) -> uses(p,y)).
+all s all p all y all q (owns(p,y,q) & bought_from(p,s) -> exists z (staff_of(z,s) & talked_to(p,z))).
+end_of_list.
+
+formulas(assumptions).
+buys(Sreekar, Melon, 1, Target).
+supermarket(Target).
+item(Melon).
+greater(1,0).
+person(Sreekar).
+has_money(Sreekar, 100).
+all m (-has_cash(Sreekar, m)).
+end_of_list.
+
+formulas(goals).
+exists z (talked_to(Sreekar,z)).
+%exists m2 (greater(100,m2)).
+%exists m2 (has_money(Sreekar,m2)).
+%exists x (pays(Sreekar, x, Target)).
+%exists x (has_credit(Sreekar, x)).
+%exists c (has_credit(Sreekar,c) | has_cash(Sreekar,c)).
+%exists m (pays(Sreekar, m, Target)).
+end_of_list.

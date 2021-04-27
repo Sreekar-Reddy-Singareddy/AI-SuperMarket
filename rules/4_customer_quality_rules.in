@@ -1,0 +1,35 @@
+%set (arithmetic).
+
+formulas(sos).
+all p exists y exists q (owns(p,y,q) & greater(q,2) -> adult(p)).
+all p (adult(p) -> -child(p)).
+all x all y (child(x) & car(y) -> -drives(x,y)).
+all x all y (adult(x) & car(y) -> drives(x,y)). % drives means a person is able to drive that car or not. This is not ownership predicate.
+all x all y all s(-drives(x,y) & supermarket(s) -> transport(x,s) = WALK).
+all x all s exists y (drives(x,y) & supermarket(s) -> transport(x,s) = CAR).
+all p all s (transport(p,s) = CAR -> exists g (gas_station(g) & location(g) = location(s) & visits(p,g))).
+
+all p all y ((vegetable(y) | fruit(y)) & eats(p,y) -> vegan(p)).
+all p exists y (meat(y) & eats(p,y) -> non_vegan(p)).
+all p all y (-chocolate(y) & -cookie(y) & eats(p,y) -> healthy(p)).
+all p exists y (beer(y) & drinks(p,y) -> adult(p)).
+all s all p1 all p2 exists y1 exists y2 exists q1 exists q2 (buys(p1,y1,q1,s) & buys(p2,y2,q2,s) & item(y1) & item(y2) & supermarket(s) & person(p1) & person(p2) -> location(p1) = location(p2)).
+all y1 all y2 (location(y1) = location(y2) -> same_location(y1, y2)).
+all x all y (same_location(x,y) & person(x) & person(y) -> seen(x,y)).
+all x all y (seen(x,y) -> seen(y,x)).
+all p exists y ((chocolate(y) | cookie(y)) & eats(p,y) -> -has_diabetes(p)).
+all p all y ((chocolate(y) | cookie(y)) & eats(p,y) -> unhealthy(p)).
+all p all y (meat(y) & eats(p,y) -> has_cholestrol(p)).
+all p (unhealthy(p) -> has_cholestrol(p) | has_diabetes(p)).
+all p exists y (sanitory_pad(y) & uses(p,y) -> female(y)).
+all p (female(y) -> -male(y)).
+all p exists y exists q (diaper(y) & owns(p,y,q) -> parent(p)).
+end_of_list.
+
+formulas(assumptions).
+
+end_of_list.
+
+formulas(goals).
+
+end_of_list.

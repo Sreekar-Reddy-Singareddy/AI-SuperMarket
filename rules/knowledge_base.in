@@ -1,0 +1,211 @@
+formulas(sos).
+
+% --------------------------------------------------------------------------------------------------------------------------------------------
+% ---------- 1. SUPER MARKET RULES       
+% --------------------------------------------------------------------------------------------------------------------------------------------
+all x all y all s (item(x) & item(y) & supermarket(s) & stores(s,x) & stores(s,y) & type(x) = type(y) -> location(x) = location(y) & in(location(x), location(s)) & in(location(y), location(s))).
+all x all s (item(x) & supermarket(s) & in(location(x),location(s)) -> exists q (owns(s,x,q) & greater(q,0))).
+all x all s all q (supermarket(s) & owns(s,x,q) & greater(q,0) -> sells(s,x)).
+all x all s (sells(s,x) -> -makes(s,x)).
+all s (supermarket(s) -> exists p (parking_lot(p) & location(p) = location(s))).
+all x all s (sells(s,x) -> partof(x,s)).
+all x all s (customer_of(x,s) | staff_of(x,s) -> partof(x,s)).
+all s all c ((exists y exists q (supermarket(s) & person(c) & item(y) & greater(q,0) & buys(c,y,q,s))) -> customer_of(c,s) & in(location(c), location(s))).
+all s (supermarket(s) -> exists p (person(p) & staff_of(p,s) & in(location(p), location(s)))).
+all s all p (staff_of(p,s) -> -customer_of(p,s)).
+all x all y (location(x) = location(y) -> same_location(x,y)).
+all x all y (time(x) = time(y) -> same_time(x,y)).
+all x all y (person(x) & person(y) & same_location(x,y) & same_time(x,y) -> seen(x,y)).
+all p all s (person(p) & supermarket(s) & in(location(p), location(s)) -> is_inside(p,s)).
+
+% --------------------------------------------------------------------------------------------------------------------------------------------
+% ---------- 2. ITEMS RULES              
+% --------------------------------------------------------------------------------------------------------------------------------------------
+all s exists t (supermarket(s) -> tomato(t) & sells(s,t)).
+all s exists b (supermarket(s) -> beef(b) & sells(s,b)).
+all s exists l (supermarket(s) -> lamb(l) & sells(s,l)).
+all s exists a (supermarket(s) -> apple(t) & sells(s,a)).
+all s exists c (supermarket(s) -> chocolate(c) & sells(s,c)).
+all s exists c (supermarket(s) -> cookie(c) & sells(s,c)).
+all s exists b (supermarket(s) -> beer(b) & sells(s,b)).
+all s exists w (supermarket(s) -> wine(w) & sells(s,w)).
+all s exists d (supermarket(s) -> diaper(d) & sells(s,d)).
+all s exists p (supermarket(s) -> sanitory_pad(p) & sells(s,p)).
+all s exists d (supermarket(s) -> deodrant(d) & sells(s,d)).
+
+all x (tomato(x) -> vegetable(x)).
+all x (beef(x) -> meat(x)).
+all x (lamb(x) -> meat(x)).
+all x (apple(x) -> fruit(x)).
+all x (chocolate(x) -> sweet(x)).
+all x (cookie(x) -> sweet(x)).
+all x (beer(x) -> alcohol(x)).
+all x (wine(x) -> alcohol(x)).
+all x (diaper(x) -> personal_care(x)).
+all x (sanitory_pad(x) -> personal_care(x)).
+all x (deodrant(x) -> personal_care(x)).
+
+all x (vegetable(x) | fruit(x) | sweet(x) -> -meat(x)).
+
+all x (vegetable(x) -> food(x)).
+all x (meat(x) -> food(x)).
+all x (fruit(x) -> food(x)).
+all x (sweet(x) -> food(x)).
+all x (alcohol(x) -> drink(x)).
+all x (personal_care(x) -> non_food(x)).
+
+all x (food(x) -> item(x)).
+all x (non_food(x) -> item(x)).
+all x (drink(x) -> item(x)).
+
+all x (tomato(x) -> type(x) = TOMATO).
+all x (beef(x) -> type(x) = BEEF).
+all x (lamb(x) -> type(x) = LAMB).
+all x (apple(x) -> type(x) = APPLE).
+all x (chocolate(x) -> type(x) = CHOCOLATE).
+all x (cookie(x) -> type(x) = COOKIE).
+all x (beer(x) -> type(x) = BEER).
+all x (wine(x) -> type(x) = WINE).
+all x (diaper(x) -> type(x) = DIAPER).
+all x (sanitory_pad(x) -> type(x) = SANITORY_PAD).
+all x (deodrant(x) -> type(x) = DEODRANT).
+
+% --------------------------------------------------------------------------------------------------------------------------------------------
+% ---------- 3. OWNERSHIP RULES          
+% --------------------------------------------------------------------------------------------------------------------------------------------
+all p all s all y all q (supermarket(s) & person(p) & item(y) & greater(q,0) & buys(p,y,q,s) -> owns(p,y,q)).
+all s all p all y all q exists m (owns(p,y,q) & person(p) & customer_of(p,s) -> pays(p,m,s) & money(m)).
+all p all y all q (food(y) & owns(p,y,q) & person(p) -> eats(p,y)).
+all p all y all q (non_food(y) & owns(p,y,q) & person(p) -> uses(p,y)).
+all p all y all q (drink(y) & owns(p,y,q) & person(p) -> drinks(p,y)).
+all s all p ((exists m1 exists m (pays(p,m,s) & money(m1) & has_money(p,m1))) -> exists m2 (money(m2) & has_money(p,m2) & is_more_money(m1,m2))).
+all p all s all m (pays(p,m,s) -> has_credit(p,m) | has_cash(p,m)).
+all s all p all y all q (owns(p,y,q) & person(p) & customer_of(p,s) -> exists z (staff_of(z,s) & talked_to(p,z))).
+all m (money(m) -> number(m)).
+
+% --------------------------------------------------------------------------------------------------------------------------------------------
+% ---------- 4. CUSTOMER QUALITIES RULES 
+% --------------------------------------------------------------------------------------------------------------------------------------------
+all p ((exists y exists q (owns(p,y,q) & greater(q,2))) -> adult(p)).
+all p (adult(p) -> -child(p)).
+all x all y  (-drives(x,y) & car(y) -> child(x)).
+all x exists y (adult(x) -> car(y) & drives(x,y)).
+all x all y all s (-drives(x,y) & supermarket(s) -> transport(x,s) = WALK).
+all x all s ((exists y drives(x,y)) & supermarket(s) -> transport(x,s) = CAR).
+all p all s (transport(p,s) = CAR -> exists g (gas_station(g) & location(g) = location(s) & visits(p,g))).
+all p all y (-meat(y) & eats(p,y) -> vegan(p)).
+all p ((exists y (meat(y) & eats(p,y))) -> non_vegan(p)).
+all p (non_vegan(p) -> -vegan(p)).
+all p all y ((eats(p,y) & -sweet(y)) | (drinks(p,y) & -alcohol(y)) -> healthy(p)).
+all p ((exists y drink(y) & drinks(p,y)) -> adult(p)).
+all s all p1 all p2 (supermarket(s) & person(p1) & person(p2) & (exists y1 exists q1 (buys(p1,y1,q1,s) & item(y1))) & (exists y2 exists q2 (buys(p2,y2,q2,s) & item(y2))) -> location(p1) = location(p2)).
+all s all p1 all p2 exists y1 exists y2 exists q1 exists q2 (buys(p1,y1,q1,s) & buys(p2,y2,q2,s) & item(y1) & item(y2) & supermarket(s) & person(p1) & person(p2) -> location(p1) = location(p2)).
+all x all y (seen(x,y) -> seen(y,x)).
+all p ((exists y (chocolate(y) | cookie(y)) & eats(p,y)) -> -has_diabetes(p)).
+all p all y ((chocolate(y) | cookie(y)) & eats(p,y) -> unhealthy(p)).
+all p all y (meat(y) & eats(p,y) -> has_cholestrol(p)).
+all p (unhealthy(p) -> has_cholestrol(p) | has_diabetes(p)).
+all p ((exists y sanitory_pad(y) & uses(p,y)) -> female(p)).
+all p (female(y) -> -male(y)).
+all p ((exists y exists q (diaper(y) & owns(p,y,q))) -> parent(p)).
+
+% --------------------------------------------------------------------------------------------------------------------------------------------
+% ---------- 5. ARITHMETIC RULES         
+% --------------------------------------------------------------------------------------------------------------------------------------------
+all x all y (number(x) & number(y) & greater(x,y) -> less(y,x)).
+all x all y (number(x) & number(y) & equal(x,y) <-> -greater(x,y) & -greater(y,x) & -less(x,y) & -less(y,x)).
+all x all y (number(x) & number(y) & (greater(x,y) | greater(y,x)) -> -equal(x,y)).
+all x all y all z (number(x) & number(y) & number(z) & -equal(x,y) & -equal(y,z) & greater(x,y) & greater(y,z) -> greater(x,z)).
+all x all y (number(x) & number(y) & equal(x,y) <-> equal(y,x)).
+
+% --------------------------------------------------------------------------------------------------------------------------------------------
+% ---------- 6. ITEM QUANTITY RULES      
+% --------------------------------------------------------------------------------------------------------------------------------------------
+all x (tomato(x) | apple(x) | beef(x) | lamb(x) -> measurement(x) = POUNDS).
+all x (chocolate(x) | cookie(x) | beer(x) | wine(x) | diaper(x) | sanitory_pad(x) | deodrant(x) -> measurement(x) = PACKS).
+
+all p all y all q (owns(p,y,q) & type(y) = TOMATO & equal(q,1) -> units(p,y) = 4).
+all p all y all q (owns(p,y,q) & type(y) = TOMATO & equal(q,2) -> units(p,y) = 8).
+all p all y all q (owns(p,y,q) & type(y) = BEEF & equal(q,1) -> units(p,y) = 1).
+all p all y all q (owns(p,y,q) & type(y) = LAMB & equal(q,1) -> units(p,y) = 1).
+all p all y all q (owns(p,y,q) & type(y) = APPLE & equal(q,1) -> units(p,y) = 2).
+all p all y all q (owns(p,y,q) & type(y) = CHOCOLATE & equal(q,1) -> units(p,y) = 10).
+all p all y all q (owns(p,y,q) & type(y) = COOKIE & equal(q,1) -> units(p,y) = 10).
+all p all y all q (owns(p,y,q) & type(y) = BEER & equal(q,1) -> units(p,y) = 6).
+all p all y all q (owns(p,y,q) & type(y) = WINE & equal(q,1) -> units(p,y) = 2).
+all p all y all q (owns(p,y,q) & type(y) = DIAPER & equal(q,1) -> units(p,y) = 8).
+all p all y all q (owns(p,y,q) & type(y) = SANITORY_PAD & equal(q,1) -> units(p,y) = 5).
+all p all y all q (owns(p,y,q) & type(y) = DEODRANT & equal(q,1) -> units(p,y) = 2).
+
+% --------------------------------------------------------------------------------------------------------------------------------------------
+% ---------- GIVEN KNOWLEDGE
+% --------------------------------------------------------------------------------------------------------------------------------------------
+person(John).
+person(Mary).
+supermarket(Safeway).
+tomato(T1).
+tomato(T2).
+beef(B1).
+stores(Safeway, T1).
+stores(Safeway, T2).
+stores(Safeway, B1).
+buys(John, T1, 1, Safeway).
+buys(Mary, T2, 2, Safeway).
+time(John) = 100.
+time(Mary) = 100.
+
+end_of_list.
+
+formulas(assumptions).
+number(0).
+number(1).
+number(2).
+number(3).
+number(4).
+number(5).
+number(6).
+number(7).
+number(8).
+number(9).
+number(10).
+greater(1,0).
+greater(2,1).
+greater(3,2).
+greater(4,3).
+greater(5,4).
+greater(6,5).
+greater(7,6).
+greater(8,7).
+greater(9,8).
+greater(10,9).
+equal(0,0).
+equal(1,1).
+equal(2,2).
+equal(3,3).
+equal(4,4).
+equal(5,5).
+equal(6,6).
+equal(7,7).
+equal(8,8).
+equal(9,9).
+equal(10,10).
+end_of_list.
+
+formulas(goals).
+
+%adult(John). % [ADULT] John is an adult.
+%greater(units(John,T), 2). % [YES] John now has >2 tomatoes.
+%exists x exists y (owns(John,x,y) & meat(x)). % [YES] John owns a meat.
+%seen(John, Mary). % NEED TO WORK.
+%exists x (tomato(x) & makes(Safeway, x)). % [NO] Safeway does not make any tomatoes.
+%eats(John, T1). % [EATS] John eats tomatoes that he bought.
+%exists d (deodrant(d) & sells(Safeway, d)). % [YES] There is atleast 1 deodrant that Safeway sells.
+%exists m (has_cash(John, m) | has_credit(John,m)). % [YES] John has either one of them since he bought something.
+%exists m (has_money(John,m) & money(m) & is_more_money(10,m)). % NEED TO WORK.
+%exists x (x != John & person(x) & is_inside(x, Safeway)). [YES] Other than John, there are Mary and the staff.
+%vegan(John).
+%exists y (meat(y) & eats(John,y)).
+%owns(John,T1,1).
+
+end_of_list.
+

@@ -1,0 +1,39 @@
+%set (arithmetic).
+
+formulas(sos).
+all s exists t (supermarket(s) -> tomato(t) & sells(s,t)).
+all s exists b (supermarket(s) -> beef(b) & sells(s,b)).
+all s exists l (supermarket(s) -> lamb(l) & sells(s,l)).
+all s exists a (supermarket(s) -> apple(t) & sells(s,a)).
+all s exists c (supermarket(s) -> chocolate(c) & sells(s,c)).
+all s exists c (supermarket(s) -> cookie(c) & sells(s,c)).
+all s exists b (supermarket(s) -> beer(b) & sells(s,b)).
+all s exists w (supermarket(s) -> wine(w) & sells(s,w)).
+all s exists d (supermarket(s) -> diaper(d) & sells(s,d)).
+all s exists p (supermarket(s) -> sanitory_pad(p) & sells(s,p)).
+all s exists d (supermarket(s) -> deodrant(d) & sells(s,d)).
+
+all x (tomato(x) -> vegetable(x)).
+all x (beef(x) | lamb(x) -> meat(x)).
+all x (apple(x) -> fruit(x)).
+all x (chocolate(x) | cookie(x) -> sweet(x)).
+all x (beer(x) | wine(x) -> alcohol(x)).
+all x (diaper(x) | sanitory_pad(x) | deodrant(x) -> personal_care(x)).
+
+all x (vegetable(x) | meat(x) | fruit(x) | sweet(x) -> food(x)).
+all x (alcohol(x) -> drink(x)).
+all x (personal_care(x) -> non_food(x)).
+
+all x (food(x) | non_food(x) | drink(x) -> item(x)).
+end_of_list.
+
+formulas(assumptions).
+supermarket(Target).
+tomato(T1).
+cookie(C1).
+deodrant(D1).
+end_of_list.
+
+formulas(goals).
+meat(C1).
+end_of_list.

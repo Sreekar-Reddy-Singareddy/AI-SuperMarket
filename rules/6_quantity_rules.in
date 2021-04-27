@@ -1,0 +1,23 @@
+%set (arithmetic).
+
+formulas(sos).
+	all x (tomato(x) & quantity(x) = 1P -> units(x) = 4).
+	all x (apple(x) & quantity(x) = 1P -> units(x) = 2).
+	all x (beef(x) & quantity(x) = 1P -> units(x) = 1).
+	all x (tomato(x) | apple(x) | beef(x) -> measurement(x) = POUNDS).
+	all x (chocolate(x) | beer(x) | diaper(x) | sanitary_pad(x) | deodrant(x) -> measurement(x) = PACKS).
+	
+end_of_list.
+
+formulas(assumptions).
+	beef(B1).
+	quantity(B1) = 1P.
+	tomato(T1).
+	quantity(T1) = 1P.
+	greater(4,3).
+	equal(1,1).
+end_of_list.
+
+formulas(goals).
+	greater(units(T1), 3) & equal(units(B1), 1).
+end_of_list.
