@@ -74,11 +74,11 @@ all x (deodrant(x) -> type(x) = DEODRANT).
 % ---------- 3. OWNERSHIP RULES          
 % --------------------------------------------------------------------------------------------------------------------------------------------
 all p all s all y all q (supermarket(s) & person(p) & item(y) & greater(q,0) & buys(p,y,q,s) -> owns(p,y,q)).
-all s all p all y all q exists m (owns(p,y,q) & person(p) & customer_of(p,s) -> pays(p,m,s) & money(m)).
+all s all p all y all q (owns(p,y,q) & person(p) & customer_of(p,s) -> exists m (pays(p,m,s) & money(m))).
 all p all y all q (food(y) & owns(p,y,q) & person(p) -> eats(p,y)).
 all p all y all q (non_food(y) & owns(p,y,q) & person(p) -> uses(p,y)).
 all p all y all q (drink(y) & owns(p,y,q) & person(p) -> drinks(p,y)).
-all s all p ((exists m1 exists m (pays(p,m,s) & money(m1) & has_money(p,m1))) -> exists m2 (money(m2) & has_money(p,m2) & is_more_money(m1,m2))).
+all s all p exists m1 ((exists m (money(m) & pays(p,m,s))) & money(m1) & has_money(p,m1) -> exists m2 (money(m2) & has_money(p,m2) & is_more_money(m1,m2))).
 all p all s all m (pays(p,m,s) -> has_credit(p,m) | has_cash(p,m)).
 all s all p all y all q (owns(p,y,q) & person(p) & customer_of(p,s) -> exists z (staff_of(z,s) & talked_to(p,z))).
 all m (money(m) -> number(m)).
@@ -153,6 +153,9 @@ buys(John, T1, 1, Safeway).
 buys(Mary, T2, 2, Safeway).
 time(John) = 100.
 time(Mary) = 100.
+money(10).
+has_money(John, 10).
+
 
 end_of_list.
 
@@ -193,10 +196,17 @@ end_of_list.
 
 formulas(goals).
 
+
+
+
+%exists m1 (has_money(John, m1) & is_more_money(10,m1)).
+%exists m (money(m) & has_money(John, m) & m=10).
+%exists m1 ((exists m (money(m) & pays(John,m,Safeway))) & money(m1) & has_money(John,m1) & m1=9).
+
 %adult(John). % [ADULT] John is an adult.
 %greater(units(John,T), 2). % [YES] John now has >2 tomatoes.
 %exists x exists y (owns(John,x,y) & meat(x)). % [YES] John owns a meat.
-%seen(John, Mary). % NEED TO WORK.
+%seen(John, Mary). % [YES] They have seen each other.
 %exists x (tomato(x) & makes(Safeway, x)). % [NO] Safeway does not make any tomatoes.
 %eats(John, T1). % [EATS] John eats tomatoes that he bought.
 %exists d (deodrant(d) & sells(Safeway, d)). % [YES] There is atleast 1 deodrant that Safeway sells.
